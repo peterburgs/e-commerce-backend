@@ -1,0 +1,9 @@
++ Strength of MongoDB:
+  - Rich set of operators, developer-friendly.
+  - Can handle unstructured data (image, video...)
+  - Avoid the strict of relationship
+  - Adapt with model changes quickly
+  - Scalable (up & out)
+  - Distributed cloud database
++ Weakness of MongoDB:
+  - Lack of relation coupling, cannot handle complex queries

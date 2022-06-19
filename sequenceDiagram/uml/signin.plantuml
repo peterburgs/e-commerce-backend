@@ -1,0 +1,40 @@
+@startuml Signin
+hide footbox
+title Sign In
+
+actor Actor as actor
+participant UserController as controller
+participant UserRepository as repo
+actor Database as database
+
+actor -> controller : signin (email, password)
+activate controller
+controller -> repo : findUserByEmail
+activate repo
+repo -> database : findUserByEmail
+activate database
+database --> repo : return result
+deactivate database
+
+alt #99FF99 user found
+repo --> controller : return user
+deactivate repo
+controller -> controller : check password
+    alt password matched
+    controller -> controller : generate token
+    controller --> actor : return authorization
+    deactivate controller
+    else password not matched
+    controller --> actor : signin failed message
+    activate controller
+    deactivate controller
+    end
+else #FFAAAA user not found
+repo --> controller : return user not found
+activate repo
+deactivate repo
+activate controller
+controller --> actor : invalid credentials message
+deactivate controller
+end
+@enduml

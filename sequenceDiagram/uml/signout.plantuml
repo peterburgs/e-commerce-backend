@@ -1,0 +1,39 @@
+@startuml Signout
+hide footbox
+title Sign out
+
+actor Actor as actor
+participant UserController as controller
+participant UserRepository as repo
+actor Database as database
+
+actor -> controller : signout (email, token)
+activate controller
+controller -> repo : findUserByEmail
+activate repo
+repo -> database : findUserByEmail
+activate database
+database --> repo : return result
+deactivate database
+
+alt #99FF99 user found
+repo --> controller : return user
+deactivate repo
+controller -> controller : revoke token
+    alt revoke succeeded
+    controller --> actor : signout successfully
+    deactivate controller
+    else revoke failed
+    controller --> actor : Token is already revoked
+    activate controller
+    deactivate controller
+    end
+else #FFAAAA user not found
+repo --> controller : return user not found
+activate repo
+deactivate repo
+activate controller
+controller --> actor : invalid credentials message
+deactivate controller
+end
+@enduml

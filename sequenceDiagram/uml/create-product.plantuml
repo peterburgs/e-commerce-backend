@@ -1,0 +1,45 @@
+@startuml create-product
+hide footbox
+title Create product
+
+actor Actor as actor
+participant AuthorizingService as authService
+participant ProductController as prdController
+participant Product as product
+participant ProductRepository as prdRepo
+
+actor Database as database
+
+actor -> authService : create product
+activate authService
+authService -> authService : validate token
+alt #99FF99 Validate token successfully
+authService -> authService : validate user type [agency]
+    alt User type matched
+    authService -> prdController : Forward
+    activate prdController
+    create product
+    prdController -> product : create new product
+    activate product
+    product --> prdController : return product
+    deactivate product
+    prdController -> prdRepo : createNewProduct(product)
+    activate prdRepo
+    prdRepo -> database : createNewProduct(product)
+    activate database
+    database --> prdRepo : return new product
+    deactivate database
+    prdRepo --> prdController : return new product
+    deactivate prdRepo
+    prdController --> actor : return new product
+    deactivate prdController
+    else User type not matched
+    authService --> actor : Permission denied
+    deactivate authService
+    end
+else #FFAAAA Validate token failed
+authService --> actor : Authorize failed
+activate authService
+deactivate authService
+end
+@enduml

@@ -1,0 +1,39 @@
+@startuml read-transaction
+hide footbox
+title Read transaction
+
+actor Actor as actor
+participant AuthorizingService as authService
+participant TransactionController as transController
+participant TransactionRepository as transRepo
+
+actor Database as database
+
+actor -> authService : read transaction based on a product and user
+activate authService
+authService -> authService : validate token
+alt #99FF99 Validate token successfully
+authService -> authService : validate user type [customer, agency, admin]
+    alt User type matched
+    authService -> transController : Forward
+    activate transController
+    transController -> transRepo : find transaction by product and user
+    activate transRepo
+    transRepo -> database : find transaction by product and user
+    activate database
+    database --> transRepo : return transaction
+    deactivate database
+    transRepo --> transController : return transaction
+    deactivate transRepo
+    transController --> actor : return transaction
+    deactivate transController
+    else User type not matched
+    authService --> actor : Permission denied
+    deactivate authService
+    end
+else #FFAAAA Validate token failed
+authService --> actor : Authorize failed
+activate authService
+deactivate authService
+end
+@enduml

@@ -1,0 +1,49 @@
+@startuml update-product
+hide footbox
+title Update product
+
+actor Actor as actor
+participant AuthorizingService as authService
+participant ProductController as prdController
+participant Product as product
+participant ProductRepository as prdRepo
+
+actor Database as database
+
+actor -> authService : Update product
+activate authService
+authService -> authService : validate token
+alt #99FF99 Validate token successfully
+authService -> authService : validate user type [agency]
+    alt User type matched
+    authService -> prdController : Forward
+    activate prdController
+    prdController -> prdRepo : findProductById
+    activate prdRepo
+    prdRepo -> database : findProductById
+    activate database
+    database --> prdRepo : return product
+    deactivate database
+    prdRepo --> prdController : return product
+    deactivate prdRepo
+    prdController -> prdController : update product
+    prdController -> prdRepo : updateProduct(product)
+    activate prdRepo
+    prdRepo -> database : updateProduct(product)
+    activate database
+    database --> prdRepo : return updated product
+    deactivate database
+    prdRepo --> prdController : return updated product
+    deactivate prdRepo
+    prdController --> actor : return updated product
+    deactivate prdController
+    else User type not matched
+    authService --> actor : Permission denied
+    deactivate authService
+    end
+else #FFAAAA Validate token failed
+authService --> actor : Authorize failed
+activate authService
+deactivate authService
+end
+@enduml

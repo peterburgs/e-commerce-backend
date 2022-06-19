@@ -1,0 +1,39 @@
+@startuml read-billing
+hide footbox
+title Read billing
+
+actor Actor as actor
+participant AuthorizingService as authService
+participant BillingController as billingController
+participant BillingRepository as billingRepo
+
+actor Database as database
+
+actor -> authService : read billing based on a product and user
+activate authService
+authService -> authService : validate token
+alt #99FF99 Validate token successfully
+authService -> authService : validate user type [customer, agency, admin]
+    alt User type matched
+    authService -> billingController : Forward
+    activate billingController
+    billingController -> billingRepo : find billing by product and user
+    activate billingRepo
+    billingRepo -> database : find billing by product and user
+    activate database
+    database --> billingRepo : return billing
+    deactivate database
+    billingRepo --> billingController : return billing
+    deactivate billingRepo
+    billingController --> actor : return billing
+    deactivate billingController
+    else User type not matched
+    authService --> actor : Permission denied
+    deactivate authService
+    end
+else #FFAAAA Validate token failed
+authService --> actor : Authorize failed
+activate authService
+deactivate authService
+end
+@enduml

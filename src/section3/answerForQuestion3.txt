@@ -1,0 +1,10 @@
+-Strength:
+  + Simple to develop
+  + Cover basic features
+- Weakness:
+  + Authentication & authorization are not implemented
+  + Have no test plan
+  + Too basic operation (use default created features from CLI)
+- How to improve:
+  + Research on JWT authentication & authorization
+  + Separate business code to smaller module (like service, interactor, etc)

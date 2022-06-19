@@ -1,0 +1,45 @@
+@startuml Signup
+hide footbox
+title Sign Up
+
+actor Actor as actor
+participant UserController as controller
+participant User as user
+participant UserRepository as repo
+actor Database as database
+
+actor -> controller : register (email, password)
+activate controller
+controller -> repo : findUserByEmail
+activate repo
+repo -> database : findUserByEmail
+activate database
+database --> repo : return result
+deactivate database
+
+alt #99FF99 user found
+repo --> controller : return user
+deactivate repo
+controller --> actor : email existed message
+deactivate controller
+
+else #FFAAAA user not found
+repo --> controller : return user not found
+activate repo
+deactivate repo
+activate controller
+create user
+controller -> user : create User
+user --> controller : return User
+controller -> repo : createUser(user)
+activate repo
+repo -> database : create User
+activate database
+database --> repo : return new user
+deactivate database
+repo --> controller : return new user
+deactivate repo
+controller --> actor : register successfully
+deactivate controller
+end
+@enduml
